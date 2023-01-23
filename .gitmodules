@@ -2,3 +2,7 @@
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
 	branch = v1.3.0
+[submodule "lib/damn-vulnerable-defi"]
+	path = lib/damn-vulnerable-defi
+	url = https://github.com/tinchoabbate/damn-vulnerable-defi
+	branch = v3.0.0
