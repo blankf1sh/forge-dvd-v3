@@ -1,0 +1,4 @@
+solmate/=lib/solmate/
+forge-std=lib/forge-std/src/
+dvd-v3=lib/damn-vulnerable-defi/contracts
+@openzeppelin=lib/openzeppelin-contracts/
