@@ -22,10 +22,9 @@ contract Unstoppable is Test {
 
     function setUp() public {
         utils = new Utilities();
-        address payable[] memory users = utils.createUsers(3);
-        deployer = users[0];
-        attacker = users[1];
-        someUser = users[2];
+        deployer = utils.setUp("Deployer", 100e18);
+        attacker = utils.setUp("Attacker", 100e18);
+        someUser = utils.setUp("SomeUser", 100e18);
 
         vm.startPrank(deployer);
 
@@ -44,18 +43,10 @@ contract Unstoppable is Test {
         rus = new ReceiverUnstoppable(address(usv));
         rus.executeFlashLoan(10);
         vm.stopPrank();
-
-        vm.label(deployer, "Deployer");
-        vm.label(attacker, "Attacker");
-        vm.label(someUser, "SomeUser");
-        vm.label(address(dvt), "Token");
-        vm.label(address(usv), "Vault");
-        vm.label(address(rus), "Receiver");
     }
 
     function testRecon() public {
-        vm.startPrank(deployer);
-        console.log("one flashloan has been executed so far");
+
     }
 
     function testExploit() public {
@@ -64,7 +55,7 @@ contract Unstoppable is Test {
         // => balanceBefore = totalAssets()
         // => totalAssets() = assset.balanceOf(address(this))
         // => convertToShares(totalSupply) = tS == 0 ? tS : tS.MulDivDown(totalAssets(), tS)
-        dvt.transfer(address(usv), INITIAL_ATTACKER_TOKEN_BALANCE);
+        // dvt.transfer(address(usv), INITIAL_ATTACKER_TOKEN_BALANCE);
         vm.stopPrank();
         vm.expectRevert(UnstoppableVault.InvalidBalance.selector);
         validation();

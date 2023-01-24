@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import "forge-std/Test.sol";
 
 contract Utilities is Test {
-    bytes32 internal nextUser = keccak256(abi.encodePacked("user address"));
+    bytes32 internal nextUser = keccak256(abi.encodePacked("recursive addresses"));
 
     function getNextUserAddress() external returns (address payable) {
         //bytes32 to address conversion
@@ -22,6 +22,20 @@ contract Utilities is Test {
             users[i] = user;
         }
         return users;
+    }
+
+    function setUp(string memory _user, uint256 amount) external returns (address payable) {
+	address payable user = this.getNextUserAddress();
+	vm.label(user, _user);
+	vm.deal(user, amount);
+	return user;
+    }
+
+    function stats(address account, string memory _user) external view {
+	console.log("~~~~~~~~~~~~~%s~~~~~~~~~~~~~", _user);
+	console.log("Address: %s", address(account));
+	console.log("Balance: %s ETH", address(account).balance/1e18);
+	console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     }
 
     /// @notice move block.number forward by a given number of blocks
