@@ -12,3 +12,8 @@ Learning to use foundry and so am using it to complete damn-vulnerable-defi v3 u
 Breaking the InvalidBalance invariant by transferring tokens directly to the vault;
 rather than using the deposit method provided by the vault.
 Different accounting methods lead to headaches !!
+
+2. NaiveReceiver
+
+Does not check whether the flashloaned amount is greater than 0. 
+Public function hence anyone can call and drain the receiver due to the flashloan fee.
