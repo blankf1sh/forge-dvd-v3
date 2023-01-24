@@ -26,7 +26,7 @@ contract NaiveReceiver is Test {
 
 		vm.startPrank(deployer);
 		nrlp = new NaiveReceiverLenderPool();
-		(bool sent, _) = payable(nrlp).call{value: ETHER_IN_POOL}("");
+		(bool sent, bytes memory data) = payable(nrlp).call{value: ETHER_IN_POOL}("");
 		require(sent, "Failed to send Ether");
 	}
 
