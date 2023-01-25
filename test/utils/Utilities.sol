@@ -4,38 +4,30 @@ pragma solidity >=0.8.0;
 import "forge-std/Test.sol";
 
 contract Utilities is Test {
-    bytes32 internal nextUser = keccak256(abi.encodePacked("recursive addresses"));
-
-    function getNextUserAddress() external returns (address payable) {
-        //bytes32 to address conversion
-        address payable user = payable(address(uint160(uint256(nextUser))));
-        nextUser = keccak256(abi.encodePacked(nextUser));
-        return user;
-    }
-
-    /// @notice create users with 100 ether balance
-    function createUsers(uint256 userNum) external returns (address payable[] memory) {
-        address payable[] memory users = new address payable[](userNum);
-        for (uint256 i = 0; i < userNum; i++) {
-            address payable user = this.getNextUserAddress();
-            vm.deal(user, 100 ether);
-            users[i] = user;
-        }
-        return users;
-    }
-
-    function setUp(string memory _user, uint256 amount) external returns (address payable) {
-	address payable user = this.getNextUserAddress();
-	vm.label(user, _user);
-	vm.deal(user, amount);
-	return user;
-    }
+	function setUp(string[3] memory _actors, uint64[3] memory amounts) 
+	   external returns (address[] memory) {
+		address[] memory actors = new address[](3);
+		for(uint256 i=0; i<3; ++i) {
+			address actor = makeAddr(_actors[i]);
+			vm.deal(actor, amounts[i]);
+			actors[i] = actor;
+		}
+		return actors;
+	}
 
     function stats(address account, string memory _user) external view {
-	console.log("~~~~~~~~~~~~~%s~~~~~~~~~~~~~", _user);
-	console.log("Address: %s", address(account));
-	console.log("Balance: %s ETH", address(account).balance/1e18);
-	console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+	console2.log("~~~~~~~~~~~~~%s~~~~~~~~~~~~~", _user);
+	console2.log("Address: %s", address(account));
+	console2.log("Balance: %s ETH", address(account).balance/1e18);
+	console2.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    }
+
+    function stats_erc20(address token, address[3] memory addresses, string[3] memory actors) external {
+	for (uint256 i=0; i<3; ++i) {
+	   console2.log("~~~~~~~~~~~~%s~~~~~~~~~~", actors[i]);
+	   console2.log("balance: ");
+	   console2.log("~~~~~~~~~~~~~~~~~~~~~~~~");
+	}
     }
 
     /// @notice move block.number forward by a given number of blocks

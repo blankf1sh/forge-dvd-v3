@@ -21,15 +21,9 @@ contract NaiveReceiver is Test {
         console.log("setting the scene");
         console.log("~~~~~~~~~~~~~~~~~");
         Utilities utils = new Utilities();
-        address payable[] memory users = utils.createUsers(3);
-        deployer = users[0];
-        vm.label(deployer, "deployer");
-        vm.deal(deployer, ETHER_IN_POOL);
-        attacker = users[1];
-        vm.label(attacker, "attacker");
-        someUser = users[2];
-        vm.label(someUser, "someUser");
-        vm.deal(someUser, ETHER_IN_RECIEVER);
+        deployer = utils.setUp("Deployer", ETHER_IN_POOL);
+        attacker = utils.setUp("Attacker", 1e18);
+        someUser = utils.setUp("SomeUser", ETHER_IN_RECIEVER);
 
         console.log("our trusted dev has released the beast");
         vm.startPrank(deployer);

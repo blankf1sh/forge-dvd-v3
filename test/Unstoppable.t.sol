@@ -10,9 +10,9 @@ contract Unstoppable is Test {
     uint256 internal constant TOKENS_IN_VAULT = 1_000_000e18;
     uint256 internal constant INITIAL_ATTACKER_TOKEN_BALANCE = 100e18;
 
-    address payable internal deployer;
-    address payable internal attacker;
-    address payable internal someUser;
+    address internal deployer;
+    address internal attacker;
+    address internal someUser;
 
     Utilities internal utils;
 
@@ -22,13 +22,18 @@ contract Unstoppable is Test {
 
     function setUp() public {
         utils = new Utilities();
-        deployer = utils.setUp("Deployer", 100e18);
-        attacker = utils.setUp("Attacker", 100e18);
-        someUser = utils.setUp("SomeUser", 100e18);
+	address [] memory actors = utils.setUp(["Deployer", "Attacker", "SomeUser"], [10e18, 1e18, 5e18]);
+        deployer = actors[0];
+        attacker = actors[1];
+        someUser = actors[2];
+
 
         vm.startPrank(deployer);
 
         dvt = new DamnValuableToken();
+
+	utils.stats_erc20(address(dvt), actors, ["Deployer", "Attacker", "SomeUser"]);
+
         usv = new UnstoppableVault(dvt, address(deployer), address(deployer));
 
         // check that usv.asset() is equal to address(dvt)
@@ -43,6 +48,8 @@ contract Unstoppable is Test {
         rus = new ReceiverUnstoppable(address(usv));
         rus.executeFlashLoan(10);
         vm.stopPrank();
+
+	utils.stats(deployer, "Deployer");
     }
 
     function testRecon() public {
