@@ -5,11 +5,15 @@ import "forge-std/Test.sol";
 
 contract Utilities is Test {
 	string[] public labels;
+	uint256[] public starting_amounts;
 
 	constructor() {
 		labels.push("Deployer");
 		labels.push("Attacker");
 		labels.push("SomeUser");
+		starting_amounts.push(1_000e18);
+		starting_amounts.push(1e18);
+		starting_amounts.push(10e18);
 	}
 
 
@@ -18,7 +22,7 @@ contract Utilities is Test {
 		address[] memory actors = new address[](3);
 		for(uint256 i=0; i<3; ++i) {
 			address actor = makeAddr(labels[i]);
-			vm.deal(actor, 100e18);
+			vm.deal(actor, starting_amounts[i]);
 			actors[i] = actor;
 		}
 		return actors;

