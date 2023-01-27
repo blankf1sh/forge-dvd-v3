@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
@@ -21,9 +22,10 @@ contract NaiveReceiver is Test {
         console.log("setting the scene");
         console.log("~~~~~~~~~~~~~~~~~");
         Utilities utils = new Utilities();
-        deployer = utils.setUp("Deployer", ETHER_IN_POOL);
-        attacker = utils.setUp("Attacker", 1e18);
-        someUser = utils.setUp("SomeUser", ETHER_IN_RECIEVER);
+        address[] memory actors = utils.setUp();
+        deployer = payable(actors[0]);
+        attacker = payable(actors[1]);
+        someUser = payable(actors[2]);
 
         console.log("our trusted dev has released the beast");
         vm.startPrank(deployer);

@@ -4,12 +4,21 @@ pragma solidity >=0.8.0;
 import "forge-std/Test.sol";
 
 contract Utilities is Test {
-	function setUp(string[3] memory _actors, uint64[3] memory amounts) 
+	string[] public labels;
+
+	constructor() {
+		labels.push("Deployer");
+		labels.push("Attacker");
+		labels.push("SomeUser");
+	}
+
+
+	function setUp() 
 	   external returns (address[] memory) {
 		address[] memory actors = new address[](3);
 		for(uint256 i=0; i<3; ++i) {
-			address actor = makeAddr(_actors[i]);
-			vm.deal(actor, amounts[i]);
+			address actor = makeAddr(labels[i]);
+			vm.deal(actor, 100e18);
 			actors[i] = actor;
 		}
 		return actors;
@@ -20,14 +29,6 @@ contract Utilities is Test {
 	console2.log("Address: %s", address(account));
 	console2.log("Balance: %s ETH", address(account).balance/1e18);
 	console2.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    }
-
-    function stats_erc20(address token, address[3] memory addresses, string[3] memory actors) external {
-	for (uint256 i=0; i<3; ++i) {
-	   console2.log("~~~~~~~~~~~~%s~~~~~~~~~~", actors[i]);
-	   console2.log("balance: ");
-	   console2.log("~~~~~~~~~~~~~~~~~~~~~~~~");
-	}
     }
 
     /// @notice move block.number forward by a given number of blocks
