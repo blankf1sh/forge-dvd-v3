@@ -11,9 +11,9 @@ contract Unstoppable is Test {
     uint256 internal constant TOKENS_IN_VAULT = 1_000_000e18;
     uint256 internal constant INITIAL_ATTACKER_TOKEN_BALANCE = 100e18;
 
-    address internal deployer;
-    address internal attacker;
-    address internal someUser;
+    address payable internal deployer;
+    address payable internal attacker;
+    address payable internal someUser;
 
     Utilities internal utils;
 
@@ -23,10 +23,9 @@ contract Unstoppable is Test {
 
     function setUp() public {
         utils = new Utilities();
-	    address [] memory actors = utils.setUp();
-        deployer = actors[0];
-        attacker = actors[1];
-        someUser = actors[2];
+        deployer = utils.getActor("Deployer", 10e18);
+        attacker = utils.getActor("Attacker", 10e18);
+        someUser = utils.getActor("SomeUser", 10e18);
 
 
         vm.startPrank(deployer);

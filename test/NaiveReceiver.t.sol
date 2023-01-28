@@ -25,10 +25,9 @@ contract NaiveReceiver is Test {
         vm.label(ETH, "ETH");
 
         Utilities utils = new Utilities();
-        address[] memory actors = utils.setUp();
-        deployer = payable(actors[0]);
-        attacker = payable(actors[1]);
-        someUser = payable(actors[2]);
+        deployer = utils.getActor("Deployer", ETHER_IN_POOL);
+        attacker = utils.getActor("Attacker", 1e18);
+        someUser = utils.getActor("someUser", ETHER_IN_RECIEVER);
 
         vm.startPrank(deployer);
         nrlp = new NaiveReceiverLenderPool();

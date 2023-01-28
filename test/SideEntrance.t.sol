@@ -19,11 +19,8 @@ contract SideEntrance is Test {
 
     function setUp() public {
         Utilities utils = new Utilities();
-        address[] memory actors = utils.setUp();
-        deployer = payable(actors[0]);
-        vm.deal(deployer, ETHER_IN_POOL);
-        attacker = payable(actors[1]);
-        someUser = payable(actors[2]);
+        deployer = utils.getActor("Deployer", ETHER_IN_POOL);
+        attacker = utils.getActor("Attacker", ATTACKER_INITIAL_BALANCE);
 
         vm.startPrank(deployer);
         selp = new SideEntranceLenderPool();
