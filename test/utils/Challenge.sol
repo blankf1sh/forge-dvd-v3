@@ -5,12 +5,15 @@ pragma solidity ^0.8.0;
 import {Test} from "forge-std/Test.sol";
 import {console2} from "forge-std/console2.sol";
 import {DamnValuableToken} from "dvd-v3/DamnValuableToken.sol";
+import {DamnValuableTokenSnapshot} from "dvd-v3/DamnValuableTokenSnapshot.sol";
 
 
 abstract contract Challenge is Test {
     mapping(uint256 => address payable) internal users;
 
     DamnValuableToken internal dvt;
+    DamnValuableTokenSnapshot internal dvts;
+
 
     address payable internal attacker;
     address payable internal deployer;
@@ -32,6 +35,11 @@ abstract contract Challenge is Test {
     function deployDVT() public {
         dvt = new DamnValuableToken();
         vm.label(address(dvt), "Token");
+    }
+
+    function deployDVTS(uint256 amount) public {
+        dvts = new DamnValuableTokenSnapshot(amount);
+        vm.label(address(dvts), "Token with Snapshot");
     }
 
     function validation() public virtual {
