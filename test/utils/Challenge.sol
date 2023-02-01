@@ -2,18 +2,39 @@
 
 pragma solidity ^0.8.0;
 
-abstract contract Challenge {
-    mapping(string => address payable) internal actors;
+import {Test} from "forge-std/Test.sol";
+import {console2} from "forge-std/console2.sol";
+import {DamnValuableToken} from "dvd-v3/DamnValuableToken.sol";
+
+
+abstract contract Challenge is Test {
+    mapping(uint256 => address payable) internal users;
+
+    DamnValuableToken internal dvt;
 
     address payable internal attacker;
     address payable internal deployer;
-    address payable internal someUser;
 
-    function normSetUp(uint256 v1, uint256 v2, uint256 v3) public {
-
+    function newActors(uint256 attacker_eth, uint256 deployer_eth) public {
+        attacker = payable(makeAddr("Attacker"));
+        vm.deal(attacker, attacker_eth);
+        deployer = payable(makeAddr("Deployer"));
+        vm.deal(deployer, deployer_eth);
     }
 
-    function validation() public {
+    function newUsers() public {
+        string[4] memory labels = ["Alice", "Bob", "Charlie", "David"];
+        for(uint256 i=0; i<4; ++i) {
+            users[i] = payable(makeAddr(labels[i]));
+        }
+    }
+
+    function deployDVT() public {
+        dvt = new DamnValuableToken();
+        vm.label(address(dvt), "Token");
+    }
+
+    function validation() public virtual {
 
     }
 }
