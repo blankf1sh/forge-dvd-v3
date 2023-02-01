@@ -6,13 +6,14 @@ import {Test} from "forge-std/Test.sol";
 import {console2} from "forge-std/console2.sol";
 import {DamnValuableToken} from "dvd-v3/DamnValuableToken.sol";
 import {DamnValuableTokenSnapshot} from "dvd-v3/DamnValuableTokenSnapshot.sol";
-
+import {DamnValuableNFT} from "dvd-v3/DamnValuableNFT.sol";
 
 abstract contract Challenge is Test {
     mapping(uint256 => address payable) internal users;
 
     DamnValuableToken internal dvt;
     DamnValuableTokenSnapshot internal dvts;
+    DamnValuableNFT internal dvnft;
 
 
     address payable internal attacker;
@@ -35,6 +36,11 @@ abstract contract Challenge is Test {
     function deployDVT() public {
         dvt = new DamnValuableToken();
         vm.label(address(dvt), "Token");
+    }
+
+    function deployDVNFT() public {
+        dvnft = new DamnValuableNFT();
+        vm.label(address(dvt), "NFT");
     }
 
     function deployDVTS(uint256 amount) public {
