@@ -12,7 +12,7 @@ import {TheRewarderPool} from "dvd-v3/the-rewarder/TheRewarderPool.sol";
 import {DamnValuableToken} from "dvd-v3/DamnValuableToken.sol";
 import {FlashLoanerPool} from "dvd-v3/the-rewarder/FlashLoanerPool.sol";
 
-import {RewardSnatcherr} from "../src/RewardSnatcherr.sol";
+import {Snatcher} from "../src/Snatcher.sol";
 
 
 contract RewardSnatcher is Challenge {
@@ -82,9 +82,8 @@ contract RewardSnatcher is Challenge {
     function test_ExploitRewarder() public {
         vm.startPrank(attacker);
         vm.warp(block.timestamp + 5 days);
-        RewardSnatcherr rs = new RewardSnatcherr(flp, trp, dvt, payable(address(attacker)));
-        rs.initiate();
-        rs.getFunds();
+        Snatcher rs = new Snatcher(flp, trp, dvt, attacker);
+        rs.snatch();
         vm.stopPrank();
         validation();
     }

